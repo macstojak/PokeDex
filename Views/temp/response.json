@@ -1,0 +1,49 @@
+{
+    "_bodyBlob": {
+        "_data": {
+            "__collector": [Object
+            ],
+            "blobId": "8bec3b05-ff26-4205-8468-cda307e72571",
+            "offset": 0,
+            "size": 1088
+        }
+    },
+    "_bodyInit": {
+        "_data": {
+            "__collector": [Object
+            ],
+            "blobId": "8bec3b05-ff26-4205-8468-cda307e72571",
+            "offset": 0,
+            "size": 1088
+        }
+    },
+    "headers": {
+        "map": {
+            "accept-ranges": "bytes",
+            "access-control-allow-origin": "*",
+            "age": "4860",
+            "cache-control": "public, max-age=86400, s-maxage=86400",
+            "cf-cache-status": "HIT",
+            "cf-ray": "5b5f0c238a06cc83-WAW",
+            "cf-request-id": "040f45ea320000cc83341cc200000001",
+            "content-type": "application/json; charset=utf-8",
+            "date": "Mon, 20 Jul 2020 19:21:49 GMT",
+            "etag": "W/\"440-IkSf8g5bnnh09KJX7nEXXhgZnf0\"",
+            "expect-ct": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\"",
+            "function-execution-id": "rw1clhl37kzj",
+            "server": "cloudflare",
+            "vary": "Accept-Encoding,cookie,need-authorization, x-fh-requested-host, accept-encoding",
+            "x-cache": "MISS",
+            "x-cache-hits": "0",
+            "x-cloud-trace-context": "c5a3954223095b13fad5c2592f7236e6",
+            "x-powered-by": "Express",
+            "x-served-by": "cache-fra19146-FRA",
+            "x-timer": "S1595268049.546548,VS0,VE514"
+        }
+    },
+    "ok": true,
+    "status": 200,
+    "statusText": undefined,
+    "type": "default",
+    "url": "https://pokeapi.co/api/v2/pokemon?limit=15"
+}
