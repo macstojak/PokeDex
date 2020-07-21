@@ -9,34 +9,38 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-
-import AsyncStorage from '@react-native-community/async-storage';
-
+import {useDispatch} from "react-redux";
 import Utils from "../utils/Utils";
-import {fetchPokemonDetails} from '../apiService';
-import {useAsyncStorage} from '../hooks/useAsyncStorage';
-
+import {fetchOnePokemonData} from "../actions/Pokemon"
 
 export const ListItem = props => {
   const [details, setDetails] = useState([]);
+  const [color, setColor]=useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+  const {url} = props;
+  const abortController = new AbortController();
+  const signal = abortController.signal;
   // const [detailsSource, setDetailsSource] = useAsyncStorage(
   //   `@pokeDex_details_${props.name}`,
   // );
   useEffect(() => {
     (async () => {
-    console.log("DETAILS", props)
+   
       setIsLoading(true);
       // const pokemonDetails = await AsyncStorage.getItem(
       //   `@pokeDex_details_${props.name}`,
       // );
       // if (pokemonDetails == null) {
-        const response = await fetchPokemonDetails(props.url);
-        setDetailsSource(response);
+    const response = await dispatch(fetchOnePokemonData(url, signal));
+     await setColor(Utils.getColor(response.types[0].type.name));
+     await setDetails(response);
+    
+        // setDetailsSource(response);
       // }
       // setDetails(detailsSource);
       setIsLoading(false);
-     
+
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,7 +53,7 @@ export const ListItem = props => {
     }
 
     return (
-      <View style={{height:"100%",color: "white",borderRadius:20,backgroundColor: Utils.getColor(details.types[0])}}>
+      <View style={{height:"100%",color: "white",borderRadius:20, backgroundColor: color}}>
      
         <Image
           source={{

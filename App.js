@@ -1,14 +1,19 @@
-import * as React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
- 
+import {useDispatch } from "react-redux"
 import {Image} from 'react-native';
  
+import {Provider} from "react-redux";
+import store from "./store";
+
 import HomeView from './Views/HomeView';
 import DetailsView from './Views/DetailsView';
 import BerriesView from './Views/BerriesView';
 import BerriesDetailsView from './Views/BerriesDetailsView';
+import { fetchAllPokemonsData } from './actions/Pokemon';
+import { fetchAllBerriesData } from './actions/Berrie';
  
 const HomeStack = createStackNavigator(); 
 const BerriesStack = createStackNavigator();
@@ -67,13 +72,25 @@ const BerriesStackScreen = () => (
       headerTitleStyle: {
         fontWeight: 'bold',
       },}}
-    name="BerriesDetails" component={BerriesDetailsView} />
+    name="Berries Details" component={BerriesDetailsView} />
     
   </BerriesStack.Navigator>
 );
- 
-function App() {
+
+function App(){
+  const dispatch = useDispatch();
+  const abortController = new AbortController();
+  const signal = abortController.signal;
+  useEffect(()=>{
+    dispatch(fetchAllPokemonsData(signal));
+    dispatch(fetchAllBerriesData(signal));
+    return function cleanup(){
+      abortController.abort();
+    }
+  },[])
+  
   return (
+    <Provider store={store}>
     <NavigationContainer >
       <Tab.Navigator
       initialRouteName="Home"
@@ -96,14 +113,23 @@ function App() {
         tabBarOptions={styles.bottomButton}
          name="Home" component={HomeStackScreen} />
        
-       <Tab.Screen
-        tabBarOptions={styles.bottomButton}
-         name="Berries" component={BerriesStackScreen} />
+      <Tab.Screen
+    tabBarOptions={styles.bottomButton} 
+      name="Berries" component={BerriesStackScreen} />  
       </Tab.Navigator>
      
     </NavigationContainer>
+    </Provider>
   );
 }
+ const AppWrapper = () =>{
+  return(
+    <Provider store={store}>
+      <App/>
+    </Provider>
+  )
+}
+
 styles={
   tabBar:{
     color: "white",
@@ -116,4 +142,4 @@ styles={
         inactiveBackgroundColor: "yellow"}
   
 }
-export default App;
+export default AppWrapper;

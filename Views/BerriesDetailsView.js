@@ -1,25 +1,38 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, ActivityIndicator, Image, StyleSheet} from 'react-native';
+import {useSelector, useDispatch} from "react-redux";
 import {useAsyncStorage} from "../hooks/useAsyncStorage";
 import AnimatedBar from "../components/AnimatedBar";
+import { fetchOneBerryData } from '../actions/Berrie';
 
 const BerriesDetailsView = ({route}) => {
-  const {name} = route.params;
-  console.log("ROUTE PARAM ", route.params)
-
-  const [detailsSource, setDetailsSource] = useAsyncStorage(`@pokeDex_berries_details_${name}`)
   
-  if(!detailsSource) return <ActivityIndicator></ActivityIndicator>;
+  const abortController = new AbortController();
+  const signal = abortController.signal;
+  const dispatch = useDispatch();
+  const {name} = route.params;
+ const berrieInfo = useSelector(state=>state.berries.filter(el=>el.name===name))
+const [berrie,setBerrie] = useState(null);
+  // const [detailsSource, setDetailsSource] = useAsyncStorage(`@pokeDex_berries_details_${name}`)
+  useEffect(()=>{
+    setBerrie(dispatch(fetchOneBerryData(berrieInfo.url,signal)))
+    console.log(berrie)
+    return function cleanup(){
+      abortController.abort();
+    }
+  }, [])
+  if(!berrie) return <ActivityIndicator></ActivityIndicator>;
   return (
     
     <View style={styles.container}>
       <View><Text style={styles.nameHeader}>{name}</Text></View>
       
-      <View styles={styles.container}>
+      <View styles={styles.container}>y
+
       
         
-        {detailsSource.flavours.map((item, index)=>{
+        {berrie.flavors.map((item, index)=>{
           return(
             
             <View style={styles.statView} key={index} style={styles.statsContainer}>

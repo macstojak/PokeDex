@@ -1,27 +1,27 @@
 export const ACTION_TYPES={
-    FETCH_POKEMONS = "FETCH_POKEMONS",
-    FETCH_DETAILS_POKEMON = "FETCH_DETAILS_POKEMON"
+    FETCH_POKEMONS: "FETCH_POKEMONS",
+    FETCH_POKEMON_DETAILS: "FETCH_POKEMON_DETAILS"
 }
 
-export const fetchPokemons = (pokemons) =>{type:ACTION_TYPES.FETCH_POKEMONS, pokemons}
-export const fetchDetailsPokemon = (pokemon) =>{type:ACTION_TYPES.FETCH_DETAILS_POKEMON, pokemon}
-export const fetchAllPokemonsData = () =>{
+export const fetchPokemons = (pokemons) =>({type:ACTION_TYPES.FETCH_POKEMONS, pokemons})
+export const fetchDetailsPokemon = (pokemon) =>({type:ACTION_TYPES.FETCH_POKEMON_DETAILS, pokemon})
+export const fetchAllPokemonsData = (signal) =>{
     return async(dispatch)=>{
         try{
-            const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=15');
+            const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=20', {signal: signal});
             const data = await response.json();
-            dispatch(fetchPokemons(data));
+            dispatch(fetchPokemons(data.results));
         }catch(e){
             console.error(e);
         }
     }
 }
-export const fetchOnePokemonData = (url) =>{
+export const fetchOnePokemonData = (url, signal) =>{
     return async(dispatch)=>{
         try{
-            const response = await fetch(url);
+            const response = await fetch(url, {signal: signal});
             const data = await response.json();
-            dispatch(fetchDetailsPokemon(data));
+            return data;
         }catch(e){
             console.error(e);
         }

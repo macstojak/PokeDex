@@ -7,6 +7,7 @@ import AnimatedBar from "../components/AnimatedBar";
 const DetailsView = ({route}) => {
   console.log("ROUTE Detail", route)
   const {name} = route.params;
+  
   const [detailsSource, setDetailsSource] = useAsyncStorage(`@pokeDex_details_${name}`)
   
   if(!detailsSource) return <ActivityIndicator></ActivityIndicator>;

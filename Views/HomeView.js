@@ -8,48 +8,56 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
-
+import {useDispatch, useSelector} from "react-redux";
 import {fetchPokemonsList} from '../apiService';
 import {useDebounce} from '../hooks/useDebounce';
 import {useAsyncStorage} from '../hooks/useAsyncStorage';
 import {ListHeader} from '../components/ListHeader';
 import {ListItem} from '../components/ListItem';
+import { fetchAllPokemonsData } from '../actions/Pokemon';
 
 const HomeView = ({navigation}) => {
   const [data, setData] = useState([]);
+  const pokemons = useSelector(state=>state.pokemons)
+  const dispatch = useDispatch();
   const [source, setSource] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const abortController = new AbortController();
+  const signal = abortController.signal;
+  useEffect(()=>{
+    const response = dispatch(fetchAllPokemonsData());
+   
+       setSource(response);
+       setData(response);
+    }, []);
 
-  useEffect(() => {
-    (async () => {
-      // const list = await AsyncStorage.getItem('@pokeDexList');
+  useEffect(()=>{
+    setData(pokemons);
+  }, [pokemons])
 
-      // if (list == null) {
-        const response = await fetchPokemonsList();
-        setData(response);
-        const stringifiedValue = JSON.stringify(response);
-        console.log("RESPONSE", response)
-        // await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
-        setSource(response);
-      // } else {
-      //   const parsedValue = JSON.parse(list);
-      //   setSource(parsedValue);
-      //   setData(parsedValue);
-      // }
-    })();
-  }, []);
+  // useEffect(() => {
+  
+  //   (async () => {
+  //    await setSource(pokemons);
+  //    await setData(pokemons);
+  //     return function cleanup(){
+  //     abortController.abort();
+  //   }
+  //   })();
+  // }, [pokemons]);
 
   const refreshPokemonsList = async () => {
     setIsRefreshing(true);
-    const response = await fetchPokemonsList();
-    const stringifiedValue = JSON.stringify(response.results);
-    // await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
-    setSource(response.results);
-    setData(response.results);
+   dispatch(fetchAllPokemonsData(signal));
+
+    setSource(pokemons);
+    setData(pokemons);
     setIsRefreshing(false);
+    // return function cleanup(){
+    //   abortController.abort();
+    // }
   };
 
 const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -71,7 +79,6 @@ useEffect(() => {
   }
 }, [debouncedSearchTerm, source, filterPokemons]);
 
-  const barStyle = Platform.OS === 'ios' ? 'default' : 'light-content';
 
   const isLoading = data == null;
 
@@ -89,7 +96,7 @@ useEffect(() => {
             data={data}
             scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item.name + index}
-            windowSize={5}
+            windowSize={2}
             // contentContainerStyle ={styles.flatList}
             renderItem={({item, index}) => {
               return (

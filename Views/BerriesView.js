@@ -1,5 +1,6 @@
 
 import React, {useEffect, useState, useCallback} from 'react';
+import {useDispatch, useSelector} from "react-redux";
 import {
   SafeAreaView,
   StyleSheet,
@@ -18,39 +19,49 @@ import {useDebounce} from '../hooks/useDebounce';
 import {useAsyncStorage} from '../hooks/useAsyncStorage';
 import {ListHeader} from '../components/ListHeader';
 import {BerrieItem} from '../components/BerrieItem';
-
+import {fetchAllBerriesData} from "../actions/Berrie"
 
 const BerriesView = ({navigation}) => {
  const [data, setData] = useState([]);
-   const [source, setSource] = useAsyncStorage('@pokeDexList_berries');
-
+ const dispatch = useDispatch();
+  const berries = useSelector(state=>state.berries)
+  //  const [source, setSource] = useAsyncStorage('@pokeDexList_berries');
+  const abortController = new AbortController();
+  const signal = abortController.signal;
   const [searchTerm, setSearchTerm] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     (async () => {
-        const list = await AsyncStorage.getItem('@pokeDexList_berries');
+      //   const list = await AsyncStorage.getItem('@pokeDexList_berries');
        
-      if (list == null) {
-        const response = await fetchBerriesList();
-        setSource(response); 
-      }else{
-        setSource(list)
+      // if (list == null) {
+        const response = await dispatch(fetchAllBerriesData(signal));
+        // setSource(response); 
+      // }else{
+      //   setSource(list)
+      // }
+      setData(response);
+      return function cleanup(){
+        abortController.abort();
       }
-      setData(source);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+useEffect(()=>{
+  setData(berries);
+}, [berries])
   const refreshBerriesList = async () => {
     try{
     
       setIsRefreshing(true);
-      const response = await fetchBerriesList(signal);
-      await setSource(response);
-      setData(source);
+      const response = await dispatch(fetchAllBerriesData(signal));
+      // await setSource(response);
+      setData(response);
       setIsRefreshing(false);
-     
+      return function cleanup(){
+        abortController.abort();
+      }
     }catch(e){
       console.log(e)
     }

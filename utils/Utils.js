@@ -1,13 +1,13 @@
 const Utils = {
     
-    getColor: (type) => {
-        if(type === undefined){
+    getColor: (name) => {
+        if(name === undefined){
             return "#4FC1A6";
         }
 
        
 
-        switch (type.type.name) {
+        switch (name) {
             case 'fire':
                 return "#F7786B"
             case 'water':
