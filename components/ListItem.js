@@ -40,7 +40,9 @@ export const ListItem = (props) => {
         
         setDetailsSource(response);
       }
+      
       setDetails(detailsSource);
+      setColor(Utils.getColor(details.types[0].type.name));
       setIsLoading(false);
       return function cleanup() {
         abortController.abort();
@@ -79,6 +81,7 @@ export const ListItem = (props) => {
   };
 
   return (
+    // <View><Text>{props.name}</Text></View>
     <TouchableOpacity
       onPress={() =>
         props.navigation.navigate('Details', {
@@ -102,12 +105,16 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   itemContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems:"center",
+    textAlign:"center",
+
     padding: 8,
     height: 140,
     marginTop: 2,
     marginBottom: 2,
-    flex: 1,
-    flexDirection: 'row',
+   
   },
   disableItemContainer: {
     backgroundColor: '#eee',

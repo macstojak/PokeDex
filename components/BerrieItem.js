@@ -37,10 +37,10 @@ export const BerrieItem = props => {
         const response = await dispatch(fetchOneBerryData(url, signal));
         setBerries(response)
        const berrieitem = await dispatch(fetchBerryImage(response.item.url, signal))
-      await  setImageUrl(berrieitem)
+    setImageUrl(berrieitem)
       //   setBerriesSource(response);
       // }
-      await setColor(Utils.getColor(response.natural_gift_type.name));   
+     setColor(Utils.getColor(response.natural_gift_type.name));   
       setIsLoading(false);
       return function cleanup(){
         abortController.abort();
@@ -57,7 +57,7 @@ export const BerrieItem = props => {
     }
 
     return (
-      <View style={{height:"100%",color: "white",borderRadius:20, backgroundColor: color}}>
+      <View style={{flex:1, flexDirection:"row", alignItems: "center", textAlign:"center",height:"100%",color: "white",borderRadius:20, backgroundColor: color}}>
      
         <Image
           source={{
@@ -79,6 +79,7 @@ export const BerrieItem = props => {
           berrie: berries,
           indexBerrie: props.index,
           url: imageUrl,
+          color: color
         })
       }
      

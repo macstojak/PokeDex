@@ -10,7 +10,7 @@ const BerriesDetailsView = ({route}) => {
   const abortController = new AbortController();
   const signal = abortController.signal;
   const dispatch = useDispatch();
-  const {name, berrie, indexBerrie, url} = route.params;
+  const {name, berrie, indexBerrie, url, color} = route.params;
   const berrieInfo = useSelector((state) =>
     state.berries.filter((el) => el.name === name),
   );
@@ -18,7 +18,10 @@ const BerriesDetailsView = ({route}) => {
 
   if (!berrie) return <ActivityIndicator></ActivityIndicator>;
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  backgroundColor:color}}>
       <Image style={styles.image} source={{uri:url}}/>
       <View>
         <Text style={styles.nameHeader}>{name}</Text>
@@ -44,7 +47,8 @@ const BerriesDetailsView = ({route}) => {
               style={styles.statsContainer}>
               <Text style={styles.statsText}>{item.flavor.name}</Text>
              <View style={styles.bar}>
-                <AnimatedBar index={index} value={item.potency} />
+                <AnimatedBar index={index} value={item.potency}></AnimatedBar> 
+                
                 </View>
             </View>
           );
@@ -59,14 +63,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'white',
-  },
+  backgroundColor:"white"
+},
   bar:{
     borderWidth: 2,
     borderStyle: 'solid',
     borderColor:"blue",
     width: 100,
-    height:10,
+    height:20,
+    margin:5,
   },
   image: {
     width: 50,

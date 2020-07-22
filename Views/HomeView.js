@@ -7,6 +7,8 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  View, 
+  Text
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch, useSelector} from "react-redux";
@@ -20,43 +22,57 @@ const HomeView = ({navigation}) => {
   const [data, setData] = useState([]);
   const pokemons = useSelector(state=>state.pokemons)
   const dispatch = useDispatch();
-  const [source, setSource] = useState(null);
+  const [source, setSource] = useAsyncStorage('@pokeDexList');
+
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const abortController = new AbortController();
   const signal = abortController.signal;
 
+useEffect(()=>{
+  dispatch(fetchAllPokemonsData(signal));
+  setSource(pokemons)
+},[])
 
   useEffect(()=>{
     (async ()=>{
       const list = await AsyncStorage.getItem('@pokeDexList');
-
+      console.log(list, pokemons)
       if (list == null) {
-      const response = await dispatch(fetchAllPokemonsData());
-      setData(response);
-        const stringifiedValue = JSON.stringify(response);
-        await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
-        setSource(response);
-      } else {
-        const parsedValue = JSON.parse(list);
-        setSource(parsedValue);
-        setData(parsedValue);
+       console.log("NO LIST", pokemons)
+        setSource(pokemons);
       }
+      setData(source);
+      // console.log("LIST", list)
+      // if (list==null) {
+      
+      // setData(pokemons);
+      //   const stringifiedValue = JSON.stringify(pokemons);
+      //   await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
+      //   setSource(pokemons);
+      //   console.log("NO LIST", pokemons)
+      // } else {
+      //   const parsedValue = JSON.parse(list);
+      //   setSource(parsedValue);
+      //   setData(parsedValue);
+       
+      // }
+      // console.log("SET DATA",data)
       // return function cleanup(){
       //   abortController.abort();
       // }
     })()
   
-    }, []);
+    }, [pokemons]);
 
   const refreshPokemonsList = async () => {
     setIsRefreshing(true);
-    const response =  await dispatch(fetchAllPokemonsData());
-    const stringifiedValue = JSON.stringify(response.results);
+    dispatch(fetchAllPokemonsData(signal));
+    const stringifiedValue = JSON.stringify(pokemons);
     await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
-    setSource(response.results);
-    setData(response.results);
+    setSource(response);
+    setData(response);
     setIsRefreshing(false);
   };
 
@@ -82,27 +98,23 @@ const HomeView = ({navigation}) => {
     }
   }, [debouncedSearchTerm, source, filterPokemons]);
 
-  const isLoading = data == null;
-
   return (
     <>
       <StatusBar barStyle="dark-content" backgroundColor="#fff8dc"  />
       <SafeAreaView style={styles.appContainer}>
-        {isLoading ? (
-          <ActivityIndicator />
-        ) : (
+      
           <FlatList
-            onRefresh={refreshPokemonsList}
-            refreshing={isRefreshing}
-            ListHeaderComponent={<ListHeader onChange={setSearchTerm} />}
+            // onRefresh={refreshPokemonsList}
+            // refreshing={isRefreshing}
+            // ListHeaderComponent={<ListHeader onChange={setSearchTerm} />}
             data={data}
-            scrollEnabled={!isRefreshing}
+            // scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item.name + index}
             windowSize={5}
             // contentContainerStyle ={styles.flatList}
             renderItem={({item, index}) => {
               return (
-              
+           <>
                 <ListItem
                   isRefreshing={isRefreshing}
                   name={item.name}
@@ -111,10 +123,11 @@ const HomeView = ({navigation}) => {
                   navigation={navigation}
                  style={styles.listItem}
                 />
+                </>
               );
             }}
           />
-        )}
+     
       </SafeAreaView>
     </>
   );
