@@ -75,9 +75,13 @@ export const BerrieItem = props => {
     <TouchableOpacity
       onPress={() =>
         props.navigation.navigate('Berries Details', {
-          name: props.name
+          name: props.name,
+          berrie: berries,
+          indexBerrie: props.index,
+          url: imageUrl,
         })
       }
+     
       disabled={!isActive}
       key={props.index}
       style={styles.itemContainer

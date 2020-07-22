@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchPokemonsList} from '../apiService';
 import {useDebounce} from '../hooks/useDebounce';
 import {useAsyncStorage} from '../hooks/useAsyncStorage';
 import {ListHeader} from '../components/ListHeader';
@@ -26,59 +26,61 @@ const HomeView = ({navigation}) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const abortController = new AbortController();
   const signal = abortController.signal;
-  useEffect(()=>{
-    const response = dispatch(fetchAllPokemonsData());
-   
-       setSource(response);
-       setData(response);
-    }, []);
+
 
   useEffect(()=>{
-    setData(pokemons);
-  }, [pokemons])
+    (async ()=>{
+      const list = await AsyncStorage.getItem('@pokeDexList');
 
-  // useEffect(() => {
+      if (list == null) {
+      const response = await dispatch(fetchAllPokemonsData());
+      setData(response);
+        const stringifiedValue = JSON.stringify(response);
+        await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
+        setSource(response);
+      } else {
+        const parsedValue = JSON.parse(list);
+        setSource(parsedValue);
+        setData(parsedValue);
+      }
+      // return function cleanup(){
+      //   abortController.abort();
+      // }
+    })()
   
-  //   (async () => {
-  //    await setSource(pokemons);
-  //    await setData(pokemons);
-  //     return function cleanup(){
-  //     abortController.abort();
-  //   }
-  //   })();
-  // }, [pokemons]);
+    }, []);
 
   const refreshPokemonsList = async () => {
     setIsRefreshing(true);
-   dispatch(fetchAllPokemonsData(signal));
-
-    setSource(pokemons);
-    setData(pokemons);
+    const response =  await dispatch(fetchAllPokemonsData());
+    const stringifiedValue = JSON.stringify(response.results);
+    await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
+    setSource(response.results);
+    setData(response.results);
     setIsRefreshing(false);
-    // return function cleanup(){
-    //   abortController.abort();
-    // }
   };
 
-const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-const filterPokemons = useCallback(
-  term =>
-    source.filter(item =>
-      item.name.toLowerCase().includes(term.toLowerCase()),
-    ),
-  [source],
-);
+  const filterPokemons = useCallback(
+    term =>
+      source.filter(item =>
+        item.name.toLowerCase().includes(term.toLowerCase()),
+      ),
+    [source],
+  );
 
-useEffect(() => {
-  if (debouncedSearchTerm) {
-    const filteredPokemons = filterPokemons(debouncedSearchTerm);
-    setData(filteredPokemons);
-  } else {
-    setData(source);
-  }
-}, [debouncedSearchTerm, source, filterPokemons]);
-
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      const filteredPokemons = filterPokemons(debouncedSearchTerm);
+      setData(filteredPokemons);
+    } else {
+      setData(source);
+    }
+    return function cleanup(){
+      abortController.abort();
+    }
+  }, [debouncedSearchTerm, source, filterPokemons]);
 
   const isLoading = data == null;
 
@@ -96,7 +98,7 @@ useEffect(() => {
             data={data}
             scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item.name + index}
-            windowSize={2}
+            windowSize={5}
             // contentContainerStyle ={styles.flatList}
             renderItem={({item, index}) => {
               return (
@@ -133,7 +135,9 @@ const styles = StyleSheet.create({
     
   },
   listItem:{
- 
+  borderWidth:2,
+  borderStyle:"solid",
+  borderColor: 'red'
   },
   container: {
     backgroundColor: '#eee',

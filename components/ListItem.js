@@ -9,39 +9,44 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import {useDispatch} from "react-redux";
-import Utils from "../utils/Utils";
-import {fetchOnePokemonData} from "../actions/Pokemon"
+import AsyncStorage from '@react-native-community/async-storage';
+import {useDispatch} from 'react-redux';
+import {useAsyncStorage} from "../hooks/useAsyncStorage";
+import Utils from '../utils/Utils';
+import {fetchOnePokemonData} from '../actions/Pokemon';
 
-export const ListItem = props => {
+export const ListItem = (props) => {
   const [details, setDetails] = useState([]);
-  const [color, setColor]=useState(null);
+ 
+  const [color, setColor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
-  const {url} = props;
   const abortController = new AbortController();
   const signal = abortController.signal;
-  // const [detailsSource, setDetailsSource] = useAsyncStorage(
-  //   `@pokeDex_details_${props.name}`,
-  // );
+  const [detailsSource, setDetailsSource] = useAsyncStorage(
+    `@pokeDex_details_${props.name}`, 
+  );
+
   useEffect(() => {
     (async () => {
-   
       setIsLoading(true);
-      // const pokemonDetails = await AsyncStorage.getItem(
-      //   `@pokeDex_details_${props.name}`,
-      // );
-      // if (pokemonDetails == null) {
-    const response = await dispatch(fetchOnePokemonData(url, signal));
-     await setColor(Utils.getColor(response.types[0].type.name));
-     await setDetails(response);
-    
-        // setDetailsSource(response);
-      // }
-      // setDetails(detailsSource);
-      setIsLoading(false);
+      const pokemonDetails = await AsyncStorage.getItem(
+        `@pokeDex_details_${props.name}`,
+      );
+      if (pokemonDetails == null) {
+        const response = await dispatch(fetchOnePokemonData(props.url, signal));
 
+        setColor(Utils.getColor(response.types[0].type.name));
+        
+        setDetailsSource(response);
+      }
+      setDetails(detailsSource);
+      setIsLoading(false);
+      return function cleanup() {
+        abortController.abort();
+      };
     })();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -53,16 +58,22 @@ export const ListItem = props => {
     }
 
     return (
-      <View style={{height:"100%",color: "white",borderRadius:20, backgroundColor: color}}>
-     
+      <View
+        style={{
+          height: '100%',
+          color: 'white',
+          borderRadius: 20,
+          backgroundColor: color,
+        }}>
         <Image
           source={{
             uri: details.sprites.front_default,
           }}
           style={styles.image}
         />
-        <Text style={styles.text}># {props.index+1} - {props.name}</Text>
-       
+        <Text style={styles.text}>
+          # {props.index + 1} - {props.name}
+        </Text>
       </View>
     );
   };
@@ -76,9 +87,7 @@ export const ListItem = props => {
       }
       disabled={!isActive}
       key={props.index}
-      style={styles.itemContainer
-    
-      }>
+      style={styles.itemContainer}>
       {renderDetails()}
     </TouchableOpacity>
   );
@@ -90,16 +99,15 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingBottom: 10,
     fontWeight: '100',
-    color: "white"
+    color: 'white',
   },
   itemContainer: {
     padding: 8,
-    height:140,
+    height: 140,
     marginTop: 2,
     marginBottom: 2,
-    flex:1,
-    flexDirection:"row",
-
+    flex: 1,
+    flexDirection: 'row',
   },
   disableItemContainer: {
     backgroundColor: '#eee',

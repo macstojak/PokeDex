@@ -80,7 +80,6 @@ useEffect(()=>{
           <FlatList
             onRefresh={refreshBerriesList}
             refreshing={isRefreshing}
-           
             data={data}
             scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item + index}

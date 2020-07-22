@@ -5,7 +5,6 @@ import {useAsyncStorage} from "../hooks/useAsyncStorage";
 import AnimatedBar from "../components/AnimatedBar";
 
 const DetailsView = ({route}) => {
-  console.log("ROUTE Detail", route)
   const {name} = route.params;
   
   const [detailsSource, setDetailsSource] = useAsyncStorage(`@pokeDex_details_${name}`)
@@ -34,7 +33,7 @@ const DetailsView = ({route}) => {
             <View style={styles.statView} key={index} style={styles.statsContainer}>
               
               <Text style={styles.statsText}>{item.stat.name}</Text>
-              <AnimatedBar index={index} value={item.base_stat}/>
+              <View style={styles.bar}><AnimatedBar index={index} value={item.base_stat}/></View>
             </View>
             
           
@@ -73,10 +72,18 @@ const styles = StyleSheet.create({
    fontSize: 26,
 
  },
+ bar:{
+  borderWidth: 2,
+  borderStyle: 'solid',
+  borderColor:"blue",
+  width: 100,
+  height:10,
+},
  statView:{
    flex:1,
    flexDirection:"row",
-   alignItems:"stretch"
+  //  alignItems:"stretch",
+  justifyContent:"flex-end"
  }
 });
 

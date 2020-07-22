@@ -31,7 +31,7 @@ const AnimatedBar = ({value, index}) =>{
 
 const styles = {
     bar: {
-        height: "50%",
+        height: "100%",
        
         backgroundColor: "#516ACC",
     },
