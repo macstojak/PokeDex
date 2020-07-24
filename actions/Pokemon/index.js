@@ -8,7 +8,7 @@ export const fetchDetailsPokemon = (pokemon) =>({type:ACTION_TYPES.FETCH_POKEMON
 export const fetchAllPokemonsData = (signal) =>{
     return async(dispatch)=>{
         try{
-            const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10', {signal: signal});
+            const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10',{signal});
             const data = await response.json();
             dispatch(fetchPokemons(data.results));
         }catch(e){

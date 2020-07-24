@@ -1,11 +1,11 @@
 import {ACTION_TYPES} from "../../actions/Pokemon";
 
-export default function(state=[], action){
+export default function(state={}, action){
     switch(action.type){
         case ACTION_TYPES.FETCH_POKEMONS:
             return action.pokemons;
         case ACTION_TYPES.FETCH_POKEMON_DETAILS:
-            return state;
+            return action.pokemon;
             default:
                 return null;
     }

@@ -11,7 +11,7 @@ import {
   Text
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch, useSelector, connect} from "react-redux";
 import {useDebounce} from '../hooks/useDebounce';
 import {useAsyncStorage} from '../hooks/useAsyncStorage';
 import {ListHeader} from '../components/ListHeader';
@@ -19,52 +19,38 @@ import {ListItem} from '../components/ListItem';
 import { fetchAllPokemonsData } from '../actions/Pokemon';
 
 const HomeView = ({navigation}) => {
-  const [data, setData] = useState([]);
-  const pokemons = useSelector(state=>state.pokemons)
+  const [data, setData] = useState();
+  const pokemons = useSelector(state=> state.pokemons)
   const dispatch = useDispatch();
   const [source, setSource] = useAsyncStorage('@pokeDexList');
-
-
   const [searchTerm, setSearchTerm] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+
   const abortController = new AbortController();
   const signal = abortController.signal;
 
-useEffect(()=>{
-  dispatch(fetchAllPokemonsData(signal));
-  setSource(pokemons)
-},[])
 
   useEffect(()=>{
-    (async ()=>{
+   (async ()=>{
       const list = await AsyncStorage.getItem('@pokeDexList');
-      console.log(list, pokemons)
-      if (list == null) {
-       console.log("NO LIST", pokemons)
+      if (list== null || !Array.isArray(list)) {
+        console.log("pokemons", pokemons)
         setSource(pokemons);
-      }
-      setData(source);
-      // console.log("LIST", list)
-      // if (list==null) {
+        setData(pokemons);  
+        console.log("NO LIST", source)  
+      }else{
       
-      // setData(pokemons);
-      //   const stringifiedValue = JSON.stringify(pokemons);
-      //   await AsyncStorage.setItem('@pokeDexList', stringifiedValue);
-      //   setSource(pokemons);
-      //   console.log("NO LIST", pokemons)
-      // } else {
-      //   const parsedValue = JSON.parse(list);
-      //   setSource(parsedValue);
-      //   setData(parsedValue);
-       
-      // }
-      // console.log("SET DATA",data)
-      // return function cleanup(){
-      //   abortController.abort();
-      // }
+        setSource(list);    
+        setData(source); 
+        console.log("LIST", source)   
+      }
+
+      return function cleanup(){
+        abortController.abort();
+      }
     })()
-  
     }, [pokemons]);
+
 
   const refreshPokemonsList = async () => {
     setIsRefreshing(true);
@@ -104,11 +90,11 @@ useEffect(()=>{
       <SafeAreaView style={styles.appContainer}>
       
           <FlatList
-            // onRefresh={refreshPokemonsList}
-            // refreshing={isRefreshing}
-            // ListHeaderComponent={<ListHeader onChange={setSearchTerm} />}
+            onRefresh={refreshPokemonsList}
+            refreshing={isRefreshing}
+            ListHeaderComponent={<ListHeader onChange={setSearchTerm} />}
             data={data}
-            // scrollEnabled={!isRefreshing}
+            scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item.name + index}
             windowSize={5}
             // contentContainerStyle ={styles.flatList}

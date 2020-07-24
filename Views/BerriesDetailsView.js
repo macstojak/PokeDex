@@ -18,27 +18,47 @@ const BerriesDetailsView = ({route}) => {
 
   if (!berrie) return <ActivityIndicator></ActivityIndicator>;
   return (
-    <View style={{ flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  backgroundColor:color}}>
-      <Image style={styles.image} source={{uri:url}}/>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#ffffcc',
+      }}>
+      <Image style={styles.image} source={{uri: url}} />
       <View>
-        <Text style={styles.nameHeader}>{name}</Text>
+        <Text
+          style={{
+            fontSize: 26,
+            fontWeight: 'bold',
+            color: color,
+          }}>
+          {name}
+        </Text>
       </View>
       <Text>Firmness: {berrie.firmness.name}</Text>
-      <View style={styles.statView} key={indexBerrie} style={styles.statsContainer}>
+      <View
+        style={styles.statView}
+        key={indexBerrie}
+        style={styles.statsContainer}>
         <Text>Growth time:</Text>
-        <View style={styles.bar}><AnimatedBar index={indexBerrie} value={berrie.growth_time} /></View>
+        <View style={styles.bar}>
+          <AnimatedBar index={indexBerrie} value={berrie.growth_time} />
+        </View>
       </View>
-      <View style={styles.statView} key={indexBerrie+1} style={styles.statsContainer}>
+      <View
+        style={styles.statView}
+        key={indexBerrie + 1}
+        style={styles.statsContainer}>
         <Text>Natural gift power:</Text>
-        <View style={styles.bar}><AnimatedBar index={indexBerrie} value={berrie.natural_gift_power} /></View>
+        <View style={styles.bar}>
+          <AnimatedBar index={indexBerrie} value={berrie.natural_gift_power} />
+        </View>
       </View>
       <View styles={styles.container}>
-      <View>
-        <Text style={styles.nameHeader}>Flavors:</Text>
-      </View>
+        <View>
+          <Text style={styles.nameHeader}>Flavors:</Text>
+        </View>
         {berrie.flavors.map((item, index) => {
           return (
             <View
@@ -46,10 +66,9 @@ const BerriesDetailsView = ({route}) => {
               key={index}
               style={styles.statsContainer}>
               <Text style={styles.statsText}>{item.flavor.name}</Text>
-             <View style={styles.bar}>
-                <AnimatedBar index={index} value={item.potency}></AnimatedBar> 
-                
-                </View>
+              <View style={styles.bar}>
+                <AnimatedBar index={index} value={item.potency}></AnimatedBar>
+              </View>
             </View>
           );
         })}
@@ -63,15 +82,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  backgroundColor:"white"
-},
-  bar:{
+    backgroundColor: '#ffffcc',
+  },
+  bar: {
     borderWidth: 2,
     borderStyle: 'solid',
-    borderColor:"blue",
+    borderColor: 'blue',
     width: 100,
-    height:20,
-    margin:5,
+    height: 20,
+    margin: 5,
   },
   image: {
     width: 50,

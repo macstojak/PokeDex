@@ -17,12 +17,12 @@ import {fetchOnePokemonData} from '../actions/Pokemon';
 
 export const ListItem = (props) => {
   const [details, setDetails] = useState([]);
- 
   const [color, setColor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const abortController = new AbortController();
   const signal = abortController.signal;
+  const [imageUrl, setImageUrl] = useState(null);
   const [detailsSource, setDetailsSource] = useAsyncStorage(
     `@pokeDex_details_${props.name}`, 
   );
@@ -33,22 +33,36 @@ export const ListItem = (props) => {
       const pokemonDetails = await AsyncStorage.getItem(
         `@pokeDex_details_${props.name}`,
       );
-      if (pokemonDetails == null) {
+      if (pokemonDetails == null || !Array.isArray(pokemonDetails)) {
         const response = await dispatch(fetchOnePokemonData(props.url, signal));
-
-        setColor(Utils.getColor(response.types[0].type.name));
+        console.log("no list details", props)
+        setDetails(response);
         
-        setDetailsSource(response);
+        setColor(Utils.getColor(response.types[0].type.name));
+        response.sprites.front_default ?
+          setImageUrl(response.sprites.front_default)
+          :
+          setImageUrl("./images/Berries.png");
+        
+        
+      }else{
+        console.log("list details", list)
+        setDetails(list);
+        setColor(Utils.getColor(list.types[0].type.name));
+        if(list.sprites.front_default){
+          setImageUrl(list.sprites.front_default)
+        }else{
+          setImageUrl("./images/Berries.png")
+        }
       }
-      
-      setDetails(detailsSource);
-      setColor(Utils.getColor(details.types[0].type.name));
+     
       setIsLoading(false);
       return function cleanup() {
         abortController.abort();
       };
     })();
-
+  
+   
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -69,7 +83,7 @@ export const ListItem = (props) => {
         }}>
         <Image
           source={{
-            uri: details.sprites.front_default,
+            uri: imageUrl,
           }}
           style={styles.image}
         />
@@ -86,6 +100,7 @@ export const ListItem = (props) => {
       onPress={() =>
         props.navigation.navigate('Details', {
           name: props.name,
+          color: color,
         })
       }
       disabled={!isActive}

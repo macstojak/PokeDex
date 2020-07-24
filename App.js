@@ -2,10 +2,9 @@ import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {useDispatch } from "react-redux"
 import {Image} from 'react-native';
  
-import {Provider} from "react-redux";
+import {Provider, useDispatch} from "react-redux";
 import store from "./store";
 
 import HomeView from './Views/HomeView';
@@ -77,22 +76,24 @@ const BerriesStackScreen = () => (
   </BerriesStack.Navigator>
 );
 
-function App(){
+const App=()=>{
   const dispatch = useDispatch();
   const abortController = new AbortController();
   const signal = abortController.signal;
   useEffect(()=>{
-    dispatch(fetchAllPokemonsData(signal));
-    dispatch(fetchAllBerriesData(signal));
-    return function cleanup(){
-      abortController.abort();
-    }
+   
+      dispatch(fetchAllPokemonsData(signal));
+      dispatch(fetchAllBerriesData(signal));
+   
+ 
   },[])
   
   return (
-    <Provider store={store}>
-    <NavigationContainer >
-      <Tab.Navigator
+  <Provider store={store}>
+      
+  <NavigationContainer >
+    
+    <Tab.Navigator
       initialRouteName="Home"
       // style={styles.tabBar}
           
@@ -109,6 +110,7 @@ function App(){
 
         })}
         tabBarOptions={styles.bottomTab}>
+        
         <Tab.Screen 
         tabBarOptions={styles.bottomButton}
          name="Home" component={HomeStackScreen} />
@@ -116,13 +118,17 @@ function App(){
       <Tab.Screen
     tabBarOptions={styles.bottomButton} 
       name="Berries" component={BerriesStackScreen} />  
+      
       </Tab.Navigator>
      
     </NavigationContainer>
     </Provider>
   );
 }
+
  const AppWrapper = () =>{
+  
+
   return(
     <Provider store={store}>
       <App/>

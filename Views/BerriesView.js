@@ -84,6 +84,7 @@ useEffect(()=>{
             scrollEnabled={!isRefreshing}
             keyExtractor={(item, index) => item + index}
             windowSize={2}
+            style={styles.container}
             renderItem={({item, index}) => {
               return (
                 <>
@@ -111,10 +112,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
+    backgroundColor: "#ffffcc",
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // flex: 1,
   },
   text: {
     fontSize: 20,
